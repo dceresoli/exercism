@@ -1,0 +1,60 @@
+package say
+
+import ( "strings"
+"fmt")
+
+var units = []string{
+	"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+	"eleven", "twelve", "thirteen", "fourteen", "fiveteen", "sixteen", "seventeen", "eighteen", "nineteen",
+}
+
+var tens = []string{
+	"zero", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+}
+
+var powers = []string{
+	"thousand", "million", "trillion", "quadrillion", "quintillion",
+}
+
+
+func say100(n int) []string {
+	if n == 0 { return []string }
+	res := make([]string, 0)
+
+	h := n / 100
+	t := (n/10)%10
+	u := n % 10
+
+	if h > 1 { res = append(res, units[u] + " hundred") }
+	if t >= 2 { 
+		if u != 0 { res = append(res, tens[t] + "-" + units[u]) } else { res = append(res, tens[t]) }
+	} else { res = append(res, units[t*10+u]) }
+        //fmt.Println(n, res)
+	return res
+}
+
+func Say(n uint64) string {
+	res := make([]string, 0)
+        groups := make([]int, 0)
+
+        fmt.Print("n=", n, " ")
+        // split into groups
+	for n >= 1000 {
+		groups = append(groups, int(n % 1000))
+		n /= 1000
+	}
+	groups = append(groups, int(n))
+        fmt.Println("groups=", groups)
+
+        // assemble result
+	for i:=len(groups)-1; i >= 1; i-- {
+		for _,c := range say100(groups[i]) { res = append(res, c) }
+		res = append(res, powers[len(groups)-i-1])
+	}
+
+        // last group
+	for _,c := range say100(int(n)) { res = append(res, c) }
+        fmt.Println(n, res)
+	return strings.Join(res, " ")
+}
+
